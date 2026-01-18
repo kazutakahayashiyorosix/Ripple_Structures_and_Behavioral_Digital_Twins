@@ -1,24 +1,26 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
-import random
+import pandas as pd  # CSV読み込み用追加
 
-# Ripple構造のシミュレーション関数
-def simulate_ripple(num_nodes=10, edge_prob=0.3, max_latency=10):
+# CSVからRippleグラフをロードする関数 (ランダム生成をCSV対応に修正)
+def load_real_ripple(data_file='real_data.csv'):
     # Directed graph作成 (協力の方向性)
     G = nx.DiGraph()
     
-    # ノード追加 (アクターID)
-    for i in range(num_nodes):
-        G.add_node(i, label=f"Actor {i}")
+    # データ読み込み
+    df = pd.read_csv(data_file)
+    
+    # ユニークなアクターをノード追加 (アクターID)
+    actors = set(df['actor_from'].unique()) | set(df['actor_to'].unique())
+    for actor in actors:
+        G.add_node(actor, label=f"Actor {actor}")
     
     # エッジ追加 (協力行動: Response or Share)
-    for i in range(num_nodes):
-        for j in range(num_nodes):
-            if i != j and random.random() < edge_prob:
-                action_type = random.choice(["Response", "Share"])
-                latency = np.random.randint(1, max_latency + 1)  # ランダム遅延 (1~10単位時間)
-                G.add_edge(i, j, action=action_type, latency=latency)
+    for _, row in df.iterrows():
+        # latencyをtimestamp差から計算 (分単位)
+        latency = (pd.to_datetime(row['timestamp_to']) - pd.to_datetime(row['timestamp_from'])).total_seconds() / 60
+        G.add_edge(row['actor_from'], row['actor_to'], action=row['event_type'], latency=latency)
     
     return G
 
@@ -39,14 +41,14 @@ def get_latency_distribution(G):
 # 可視化
 def visualize_ripple(G):
     pos = nx.spring_layout(G)
-    edge_labels = {(u, v): f"{d['action']} ({d['latency']})" for u, v, d in G.edges(data=True)}
+    edge_labels = {(u, v): f"{d['action']} ({d['latency']:.2f})" for u, v, d in G.edges(data=True)}
     nx.draw(G, pos, with_labels=True, node_color='lightblue', arrows=True)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-    plt.title("Ripple Structure Simulation")
+    plt.title("Ripple Structure from CSV Data")
     plt.show()
 
-# 実行例
-G = simulate_ripple(num_nodes=8, edge_prob=0.2, max_latency=5)
+# 実行例 (CSVからロード)
+G = load_real_ripple('real_data.csv')  # 実際のCSVファイル名に置き換え
 print(f"Max Ripple Depth: {calculate_depth(G)}")
 latencies = get_latency_distribution(G)
 print(f"Latency Distribution: {latencies} (Mean: {np.mean(latencies) if latencies else 0:.2f})")
