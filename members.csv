@@ -1,0 +1,6 @@
+id,userid,name,email,password,picture,tel,time,coment,pre_userid,pre_created,reset_token,reset_expires,created,modified,is_verified,wallet_address,wallet_chain_id,wallet_verified_at,wallet_sig_nonce,thanks_cou
+1,user1,Alice,alice@example.com,hashed_pw1,pic1.jpg,123-456-7890,2026-01-18 04:35:56.328931,Comment1,,None,None,None,2026-01-18 04:35:56.328931,2026-01-18 04:35:56.328931,True,0x123abc,1.0,2026-01-18 04:35:56.328931,12345,10
+2,user2,Bob,bob@example.com,hashed_pw2,pic2.jpg,234-567-8901,2026-01-18 04:35:56.328931,Comment2,1.0,None,None,None,2026-01-17 04:35:56.328931,2026-01-18 04:35:56.328931,True,0x456def,1.0,None,67890,20
+3,user3,Charlie,charlie@example.com,hashed_pw3,pic3.jpg,345-678-9012,2026-01-18 04:35:56.328931,Comment3,2.0,None,None,None,2026-01-16 04:35:56.328931,2026-01-18 04:35:56.328931,False,None,None,None,None,5
+4,user4,David,david@example.com,hashed_pw4,pic4.jpg,456-789-0123,2026-01-18 04:35:56.328931,Comment4,3.0,None,None,None,2026-01-15 04:35:56.328931,2026-01-18 04:35:56.328931,True,0x789ghi,1.0,2026-01-18 04:35:56.328931,11223,15
+5,user5,Eve,eve@example.com,hashed_pw5,pic5.jpg,567-890-1234,2026-01-18 04:35:56.328931,Comment5,4.0,None,None,None,2026-01-14 04:35:56.328931,2026-01-18 04:35:56.328931,False,None,None,None,None,8

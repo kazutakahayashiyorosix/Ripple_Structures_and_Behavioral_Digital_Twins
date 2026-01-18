@@ -1,0 +1,3 @@
+id,request_id,share_id,channel,ripple_depth,visitor_user_id,session_token,user_agent,referrer,ip_hash,created_at
+301,101,401,Channel1,1,3,sess1,UA1,ref1.com,hash1,2026-01-18 04:35:26.328931
+302,102,402,Channel2,2,4,sess2,UA2,ref2.com,hash2,2026-01-18 04:34:56.328931
