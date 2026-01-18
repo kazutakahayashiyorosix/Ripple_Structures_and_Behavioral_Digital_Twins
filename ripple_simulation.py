@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import hashlib  # 匿名化用
+import sys  # コマンドライン引数用追加
 
 # 複数のCSVからRippleグラフを構築
 def load_yorosix_ripple(data_dir='data/'):
@@ -84,9 +85,13 @@ def visualize_ripple(G):
     plt.title("Ripple Structure from YOROSIX CSV")
     plt.show()
 
-# 実行例
-G = load_yorosix_ripple('data/')  # CSVフォルダ指定
-print(f"Max Ripple Depth: {calculate_depth(G)}")
-latencies = get_latency_distribution(G)
-print(f"Latency Distribution: {latencies} (Mean: {np.mean(latencies) if latencies else 0:.2f})")
-visualize_ripple(G)
+# 実行例 (コマンドラインでフォルダパス指定: sys.argv[1])
+if __name__ == "__main__":
+    data_dir = sys.argv[1] if len(sys.argv) > 1 else 'data/'  # ユーザ指定 or デフォルト
+    print(f"Loading from folder: {data_dir}")
+    G = load_yorosix_ripple(data_dir)
+    print(f"Max Ripple Depth: {calculate_depth(G)}")
+    latencies = get_latency_distribution(G)
+    print(f"Latency Distribution: {latencies} (Mean: {np.mean(latencies) if latencies else 0:.2f})")
+    visualize_ripple(G)
+
