@@ -1,4 +1,4 @@
 id,place,Whatishe,message,url,is_finalized,finalized_at,picture2,member_id,reply_post_id,is_deleted,request_type,is_closed,closed_at,deleted_at,created,vote_deadline_at,modified
-101,Location1,What1,Message1,url1.com,True,2026-01-18 04:35:56.328931,pic101.jpg,1,None,False,Request,False,None,None,2026-01-18 03:35:56.328931,2026-01-25 04:35:56.328931,2026-01-18 04:35:56.328931
-102,Location2,What2,Message2,url2.com,False,None,pic102.jpg,2,101.0,False,Share,True,2026-01-18 04:35:56.328931,None,2026-01-18 02:35:56.328931,2026-01-25 04:35:56.328931,2026-01-18 04:35:56.328931
-103,Location3,What3,Message3,url3.com,True,2026-01-18 04:35:56.328931,pic103.jpg,3,102.0,False,Response,False,None,None,2026-01-18 01:35:56.328931,2026-01-25 04:35:56.328931,2026-01-18 04:35:56.328931
+101,Tokyo,Help needed,Looking for recommendations on good restaurants in Shibuya,https://example.com/req101,0,,pic101.jpg,1,,0,web2,0,,,2026-01-01 10:00:00,2026-01-08 10:00:00,2026-01-01 10:00:00
+102,Osaka,Advice wanted,Need advice on starting a small business,https://example.com/req102,0,,pic102.jpg,2,,0,web2,0,,,2026-01-01 11:30:00,2026-01-08 11:30:00,2026-01-01 11:30:00
+103,Kyoto,Question,Where can I find traditional craft workshops?,https://example.com/req103,0,,pic103.jpg,3,,0,web2,0,,,2026-01-01 13:00:00,2026-01-08 13:00:00,2026-01-01 13:00:00
