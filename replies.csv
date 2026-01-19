@@ -1,3 +1,5 @@
 id,request_id,name,email,reply_text,voter_token,created_at,is_deleted,deleted_at,owner_thanked,deleted_flag,approve_count,reject_count
-201,101,ReplyName1,reply1@example.com,Reply text 1,token1,2026-01-18 04:25:56.328931,False,None,True,0,5,1
-202,102,ReplyName2,reply2@example.com,Reply text 2,token2,2026-01-18 04:15:56.328931,False,None,False,0,3,2
+201,101,Bob,bob@example.com,I recommend Ichiran Ramen in Shibuya - great atmosphere and food!,token001,2026-01-01 12:00:00,0,,1,0,3,0
+202,101,Charlie,charlie@example.com,Try Uobei for amazing sushi. Very affordable too.,token002,2026-01-01 14:30:00,0,,0,0,2,0
+203,102,David,david@example.com,Check out the local business support center. They offer free consultations.,token003,2026-01-01 15:00:00,0,,1,0,4,0
+204,103,Eve,eve@example.com,Kyoto Handicraft Center is perfect for traditional workshops. Highly recommended!,token004,2026-01-01 16:00:00,0,,1,0,5,0
