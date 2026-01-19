@@ -1,6 +1,7 @@
+
 Ripple Structure Simulation
 
-This repository provides a Python-based simulation for modeling Ripple structures from YOROSIX behavioral event data, as introduced in the paper:
+This repository provides a Python simulation for modeling Ripple structures from YOROSIX behavioral event data, as introduced in the paper:
 
 📄 Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins
 Kazutaka Hayashi
@@ -8,7 +9,7 @@ DOI: https://doi.org/10.5281/zenodo.18298249
 
 ---
 
-Overview
+1. Overview
 
 Ripple structures represent directional causal chains of cooperative actions
 (e.g., A helps B → B helps C → …)
@@ -26,7 +27,7 @@ Key Concepts
 
 ---
 
-Requirements
+2. Requirements
 
 • Python 3.8+
 
@@ -43,16 +44,14 @@ pip install networkx matplotlib numpy pandas
 
 ---
 
-Quick Start
+3. Quick Start
 
-1. Run with Sample Data (included)
+3.1 Run with Sample Data
 
 python ripple_simulation.py sample_data/
 
 
 Expected output:
-
-Loading from folder: sample_data/
 
 === Ripple Analysis Results ===
 Total Nodes: 5
@@ -60,14 +59,13 @@ Total Edges: 10
 Max Ripple Depth: 2
 Breadth per Depth: {0: 1, 1: 3, 2: 1}
 Latency Distribution: Mean=105.00min, Std=45.23min
-  Min=30.00min, Max=180.00min
 
 
-A visualization window will display the Ripple graph.
+A visualization window will appear.
 
 ---
 
-2. Run with Your Own Data
+3.2 Run with Your Own Data
 
 Place the following 6 CSV files in a folder:
 
@@ -90,28 +88,28 @@ python ripple_simulation.py /path/to/your/csv/folder/
 
 ---
 
-Sample Data Description
+4. Sample Data Description
 
 The sample_data/ folder includes:
 
-• 5 actors (Alice, Bob, Charlie, David, Eve)
-• 3 Requests
-• 4 Responses
-• 4 Share events
-• 5 Visit events
-• 4 Thanks events
+• 5 actors
+• 3 requests
+• 4 responses
+• 4 share events
+• 5 visit events
+• 4 thanks events
 
 
 Example Ripple Chains
 
-1. Request 101: Alice → Bob (depth 1) → Charlie (depth 2)
-2. Request 102: Bob → David (depth 1)
-3. Request 103: Charlie → Eve (depth 1)
+1. Alice → Bob (depth 1) → Charlie (depth 2)
+2. Bob → David
+3. Charlie → Eve
 
 
 ---
 
-Code Explanation
+5. Code Explanation
 
 Core Functions
 
@@ -125,63 +123,51 @@ Core Functions
 
 `calculate_depth(G, origin)`
 
-• Computes maximum Ripple depth
-
+Computes maximum Ripple depth.
 
 `calculate_breadth(G, origin)`
 
-• Counts cooperators at each depth
-
+Counts cooperators at each depth.
 
 `get_latency_distribution(G)`
 
-• Extracts Δt for all edges
-
+Extracts Δt for all edges.
 
 `visualize_ripple(G)`
 
-• Draws Ripple graph with action types, latency, and depth
-
+Draws Ripple graph with action types, latency, and depth.
 
 ---
 
-Customization
+6. Customization
 
 Add new event types
 
-for _, row in custom_events.iterrows():
-    from_id = hash_id(row['actor_id'])
-    to_id = hash_id(row['target_id'])
-    G.add_edge(from_id, to_id, action='CustomAction', latency=...)
+G.add_edge(from_id, to_id, action='CustomAction', latency=...)
 
 
 Change latency units
 
-latency = (pd.to_datetime(row['event_time']) -
-           pd.to_datetime(row['origin_time'])).total_seconds() / 3600
+... / 3600  # minutes → hours
 
 
 Modify anonymization
 
-def hash_id(id_value):
-    return hashlib.sha256(str(id_value).encode()).hexdigest()[:12]
+hash_id(... )[:12]
 
 
 ---
 
-Full Dataset Access
+7. Full Dataset Access
 
-Full YOROSIX observational datasets are proprietary and available to research collaborators.
+Full YOROSIX datasets are available to research collaborators.
 
 Contact:
-Kazutaka Hayashi
 kazutaka.hayashi@yorosix.com
-
-Co-authorship opportunities are available for empirical validation work.
 
 ---
 
-Citation
+8. Citation
 
 @article{hayashi2026ripple,
   title={Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins},
@@ -194,66 +180,68 @@ Citation
 
 ---
 
-Theoretical Background
+9. Theoretical Background
 
-This simulation implements the Ripple framework, which models cooperation as:
+Ripple models cooperation as:
 
 1. Directional behavioral events
 2. Information flow with measurable latency
 3. Emergent propagation without centralized control
 
 
-Key predictions:
+Predictions tested:
 
 • Cooperation emerges without incentives
 • Propagation follows non-optimal paths
 • Re-propagation roles emerge organically
 
 
-See the paper for full theory and validation.
-
 ---
 
-Troubleshooting
+10. Troubleshooting
 
 Issue	Solution	
-FileNotFoundError: members.csv	Ensure all 6 CSV files exist	
-KeyError: ‘email’	Check email column in members.csv & replies.csv	
+FileNotFoundError	Ensure all 6 CSV files exist	
+KeyError: email	Check email column in members.csv & replies.csv	
 Empty graph	Verify IDs and non-empty CSVs	
-No visualization	Save instead: plt.savefig('ripple_graph.png')	
+No visualization	Use plt.savefig('ripple_graph.png')	
 
 
 ---
 
-License
+11. License
 
 MIT License © 2026 Kazutaka Hayashi
 
 ---
 
-Acknowledgments
+12. Acknowledgments
 
-This work is part of ongoing research on decentralized cooperation systems and Behavioral Digital Twins.
-Special thanks to the YOROSIX community.
+Thanks to the YOROSIX community for enabling non-interventional observational research.
 
 ---
 
+🔵 日本語版 README
 
+---
 
 Ripple Structure Simulation（リップル構造シミュレーション）
 
-このリポジトリは、論文
-「Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins」
-（DOI: https://doi.org/10.5281/zenodo.18298249） (doi.org in Bing)
+このリポジトリは、論文：
+
+📄 「Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins」
+DOI: https://doi.org/10.5281/zenodo.18298249
+
 で提案された Ripple（協力の伝播構造） を Python で再現するシミュレーションコードです。
 
 ---
 
-概要
+1. 概要
 
-Ripple 構造とは、
+Ripple 構造とは：
+
 A が B を助け、B が C を助け…
-というような 協力行動の因果的な伝播 を、時間情報を含む有向グラフとして表現する枠組みです。
+という協力行動の因果的な伝播を、時間情報を含む有向グラフとして表現する枠組みです。
 
 このシミュレーションでは、YOROSIX の行動ログ（CSV）から Ripple グラフを構築します。
 
@@ -267,7 +255,7 @@ A が B を助け、B が C を助け…
 
 ---
 
-必要環境
+2. 必要環境
 
 • Python 3.8+
 
@@ -277,45 +265,33 @@ A が B を助け、B が C を助け…
 pip install -r requirements.txt
 
 
-または手動で：
+または：
 
 pip install networkx matplotlib numpy pandas
 
 
 ---
 
-クイックスタート
+3. クイックスタート
 
-1. サンプルデータで実行
+3.1 サンプルデータで実行
 
 python ripple_simulation.py sample_data/
 
 
-出力例：
-
-=== Ripple Analysis Results ===
-Total Nodes: 5
-Total Edges: 10
-Max Ripple Depth: 2
-Breadth per Depth: {0: 1, 1: 3, 2: 1}
-Latency Distribution: Mean=105.00min ...
-
-
-Ripple グラフが可視化されます。
-
 ---
 
-2. 自分のデータで実行
+3.2 自分のデータで実行
 
 以下の 6つの CSV をフォルダに配置：
 
 ファイル名	内容	
 members.csv	ユーザー情報	
-posts.csv	リクエスト（起点）	
+posts.csv	リクエスト	
 replies.csv	レスポンス	
-share_links.csv	シェアによる伝播	
-request_visits.csv	訪問ログ（深さ付き）	
-thanks_logs.csv	サンクス（任意）	
+share_links.csv	シェア	
+request_visits.csv	訪問ログ	
+thanks_logs.csv	サンクス	
 
 
 重要:
@@ -328,7 +304,7 @@ python ripple_simulation.py /path/to/your/csv/folder/
 
 ---
 
-サンプルデータの内容
+4. サンプルデータの内容
 
 • 5人のアクター
 • 3つのリクエスト
@@ -338,74 +314,38 @@ python ripple_simulation.py /path/to/your/csv/folder/
 • 4つのサンクス
 
 
-Ripple 例
-
-1. Alice → Bob（深さ1）→ Charlie（深さ2）
-2. Bob → David
-3. Charlie → Eve
-
-
 ---
 
-コード解説
+5. コード解説
 
 主な関数
 
-`load_yorosix_ripple(data_dir)`
+• load_yorosix_ripple()
+• calculate_depth()
+• calculate_breadth()
+• get_latency_distribution()
+• visualize_ripple()
 
-• 6 CSV を読み込み
-• SHA-256 で匿名化
-• Ripple グラフを構築
-• email でレスポンスを紐付け
-
-
-`calculate_depth(G, origin)`
-
-Ripple の最大深さを計算
-
-`calculate_breadth(G, origin)`
-
-深さごとの協力者数を算出
-
-`get_latency_distribution(G)`
-
-全エッジの時間差を抽出
-
-`visualize_ripple(G)`
-
-Ripple グラフを可視化
 
 ---
 
-カスタマイズ
+6. カスタマイズ
 
 新しいイベントタイプの追加
 
 G.add_edge(from_id, to_id, action='CustomAction', latency=...)
 
 
-レイテンシ単位の変更
-
-... / 3600  # 分→時間
-
-
-匿名化の変更
-
-hash_id(... )[:12]
-
-
 ---
 
-データアクセス
+7. データアクセス
 
-YOROSIX の完全データセットは共同研究者に提供可能です。
-
-連絡先：
+共同研究者向けに提供可能です。
 kazutaka.hayashi@yorosix.com
 
 ---
 
-引用
+8. 引用
 
 @article{hayashi2026ripple,
   ...
@@ -414,41 +354,35 @@ kazutaka.hayashi@yorosix.com
 
 ---
 
-理論背景
+9. 理論背景
 
-Ripple は以下を前提に構築されています：
+Ripple は以下を前提に構築：
 
-1. 行動ベースの因果構造
-2. 情報としての協力
-3. 非中央集権的な伝播
-
-
-予測される現象：
-
-• インセンティブなしで協力が生まれる
-• 最適ではない経路で伝播する
-• 再伝播ノードが自然に形成される
+• 行動ベースの因果構造
+• 情報としての協力
+• 非中央集権的な伝播
 
 
 ---
 
-トラブルシューティング
+10. トラブルシューティング
 
 問題	解決策	
-FileNotFoundError	6 CSV が揃っているか確認	
-KeyError: email	members と replies の email を確認	
+FileNotFoundError	CSV が揃っているか確認	
+KeyError: email	email 列を確認	
 グラフが空	ID の整合性を確認	
 可視化されない	plt.savefig() を使用	
 
 
 ---
 
-ライセンス
+11. ライセンス
 
 MIT License © 2026 Kazutaka Hayashi
 
 ---
 
-謝辞
+12. 謝辞
 
-非介入型観察の基盤を提供した YOROSIX コミュニティに感謝します。
+YOROSIX コミュニティに感謝します。
+
