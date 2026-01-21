@@ -1,157 +1,161 @@
-
 Ripple Structure Simulation
 
-This repository provides a Python simulation for modeling Ripple structures from YOROSIX behavioral event data, as introduced in the paper:
+This repository provides a Python-based simulation for modeling **Ripple Structures** from YOROSIX behavioral event data, as introduced in the paper:
 
-📄 Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins
-Kazutaka Hayashi
+📄 **Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins**  
+Kazutaka Hayashi  
 DOI: https://doi.org/10.5281/zenodo.18298249
 
 ---
 
-1. Overview
+## 1. Overview
 
-Ripple structures represent directional causal chains of cooperative actions
-(e.g., A helps B → B helps C → …)
-modeled as a directed temporal graph.
-
-This simulation uses NetworkX to construct Ripple graphs from CSV-based behavioral logs.
-
-Key Concepts
-
-• Nodes: Anonymized actors
-• Edges: Cooperative actions (Response, Share, Visit, Thanks)• Latency: Time delay between actions (minutes)
-• Ripple Depth: Propagation distance from the origin request
+Ripple Structures represent **directional causal chains of cooperative actions**, such as:
 
 
+
+A helps B → B helps C → C helps D → …
+
+
+These chains are modeled as a **directed temporal graph**, where each edge represents a cooperative action with measurable latency.
+
+This simulation constructs Ripple graphs from CSV-based behavioral logs using **NetworkX**.
+
+### Key Concepts
+
+- **Nodes**: Anonymized actors  
+- **Edges**: Cooperative actions  
+  - Response  
+  - Share  
+  - Visit  
+  - Thanks  
+- **Latency**: Time delay between actions (minutes)  
+- **Ripple Depth**: Propagation distance from the origin request  
 
 ---
 
-2. Requirements
+## 2. Requirements
 
-• Python 3.8+
+- Python **3.8+**
+
+### Install dependencies
 
 
-Install dependencies
 
 pip install -r requirements.txt
 
 
 Or install manually:
 
+
+
 pip install networkx matplotlib numpy pandas
 
 
 ---
 
-3. Quick Start
+## 3. Quick Start
 
-3.1 Run with Sample Data
+### 3.1 Run with Sample Data
+
+
 
 python ripple_simulation.py sample_data/
 
 
 Expected output:
 
-=== Ripple Analysis Results ===
-Total Nodes: 5
-Total Edges: 10
-Max Ripple Depth: 2
-Breadth per Depth: {0: 1, 1: 3, 2: 1}
-Latency Distribution: Mean=105.00min, Std=45.23min
+
+
+=== Ripple Analysis Results === Total Nodes: 5 Total Edges: 10 Max Ripple Depth: 2 Breadth per Depth: {0: 1, 1: 3, 2: 1} Latency Distribution: Mean=105.00min, Std=45.23min
 
 
 A visualization window will appear.
 
 ---
 
-3.2 Run with Your Own Data
+### 3.2 Run with Your Own Data
 
-Place the following 6 CSV files in a folder:
+Place the following **6 CSV files** in a folder:
 
-File	Description	
-members.csv	User information	
-posts.csv	Requests (origin nodes)	
-replies.csv	Responses to requests	
-share_links.csv	Share propagation events	
-request_visits.csv	Visit events with ripple depth	
-thanks_logs.csv	Thank events (optional)	
+| File | Description |
+|------|-------------|
+| members.csv | User information |
+| posts.csv | Requests (origin nodes) |
+| replies.csv | Responses to requests |
+| share_links.csv | Share propagation events |
+| request_visits.csv | Visit events with ripple depth |
+| thanks_logs.csv | Thank events (optional) |
 
-
-Important:
-Replies are linked to members via email, not giver_member_id.
+**Important:**  
+Replies are linked to members **via email**, not via `giver_member_id`.
 
 Run:
+
+
 
 python ripple_simulation.py /path/to/your/csv/folder/
 
 
 ---
 
-4. Sample Data Description
+## 4. Sample Data Description
 
-The sample_data/ folder includes:
+The `sample_data/` folder includes:
 
-• 5 actors
-• 3 requests
-• 4 responses
-• 4 share events
-• 5 visit events
-• 4 thanks events
+- 5 actors  
+- 3 requests  
+- 4 responses  
+- 4 share events  
+- 5 visit events  
+- 4 thanks events  
 
+### Example Ripple Chains
 
-Example Ripple Chains
-
-1. Alice → Bob (depth 1) → Charlie (depth 2)
-2. Bob → David
-3. Charlie → Eve
-
+1. Alice → Bob (depth 1) → Charlie (depth 2)  
+2. Bob → David  
+3. Charlie → Eve  
 
 ---
 
-5. Code Explanation
+## 5. Code Explanation
 
-Core Functions
+### Core Functions
 
-`load_yorosix_ripple(data_dir)`
+#### `load_yorosix_ripple(data_dir)`
+- Loads all 6 CSV files  
+- Anonymizes actors via SHA-256  
+- Builds a directed Ripple graph  
+- Links replies via email matching  
 
-• Loads 6 CSV files
-• Anonymizes actors via SHA-256
-• Builds directed Ripple graph
-• Links replies via email matching
-
-
-`calculate_depth(G, origin)`
-
+#### `calculate_depth(G, origin)`
 Computes maximum Ripple depth.
 
-`calculate_breadth(G, origin)`
-
+#### `calculate_breadth(G, origin)`
 Counts cooperators at each depth.
 
-`get_latency_distribution(G)`
-
+#### `get_latency_distribution(G)`
 Extracts Δt for all edges.
 
-`visualize_ripple(G)`
-
-Draws Ripple graph with action types, latency, and depth.
+#### `visualize_ripple(G)`
+Draws the Ripple graph with action types, latency, and depth.
 
 ---
 
-6. Customization
+## 6. Customization
 
-Add new event types
+### Add new event types
 
+```python
 G.add_edge(from_id, to_id, action='CustomAction', latency=...)
 
 
 Change latency units
 
-... / 3600  # minutes → hours
+... / 3600   # minutes → hours
 
 
-Modify anonymization
+Modify anonymization length
 
 hash_id(... )[:12]
 
@@ -221,18 +225,16 @@ Thanks to the YOROSIX community for enabling non-interventional observational re
 
 ---
 
-🔵 日本語版 README
-
 ---
+
+
 
 Ripple Structure Simulation（リップル構造シミュレーション）
 
-このリポジトリは、論文：
+このリポジトリは、以下の論文で提案された Ripple（協力の伝播構造） を Python で再現するシミュレーションコードです。
 
 📄 「Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins」
 DOI: https://doi.org/10.5281/zenodo.18298249
-
-で提案された Ripple（協力の伝播構造） を Python で再現するシミュレーションコードです。
 
 ---
 
@@ -240,17 +242,23 @@ DOI: https://doi.org/10.5281/zenodo.18298249
 
 Ripple 構造とは：
 
-A が B を助け、B が C を助け…
-という協力行動の因果的な伝播を、時間情報を含む有向グラフとして表現する枠組みです。
+A が B を助け、B が C を助け、C が D を助け…
+
+
+という 協力行動の因果的な伝播 を、時間情報を含む 有向グラフ として表現する枠組みです。
 
 このシミュレーションでは、YOROSIX の行動ログ（CSV）から Ripple グラフを構築します。
 
 キー概念
 
 • ノード: 匿名化されたアクター
-• エッジ: 協力行動（Response / Share / Visit / Thanks）• Latency: 行動間の時間差（分）
-• Ripple Depth: 起点からの伝播距離
+• エッジ: 協力行動• Response
+• Share
+• Visit
+• Thanks
 
+• Latency: 行動間の時間差（分）
+• Ripple Depth: 起点からの伝播距離
 
 
 ---
@@ -295,7 +303,7 @@ thanks_logs.csv	サンクス
 
 
 重要:
-replies.csv は giver_member_id を使わず、email で紐付けます。
+replies.csv は giver_member_id ではなく email で紐付けます。
 
 実行：
 
@@ -318,7 +326,7 @@ python ripple_simulation.py /path/to/your/csv/folder/
 
 5. コード解説
 
-主な関数
+主な関数：
 
 • load_yorosix_ripple()
 • calculate_depth()
@@ -386,3 +394,5 @@ MIT License © 2026 Kazutaka Hayashi
 
 YOROSIX コミュニティに感謝します。
 
+
+---
