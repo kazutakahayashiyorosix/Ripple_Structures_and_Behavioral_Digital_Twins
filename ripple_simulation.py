@@ -2,142 +2,177 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import hashlib  # 匿名化用
-import sys  # コマンドライン引数用追加
+import hashlib
+import sys
 
-# 複数のCSVからRippleグラフを構築
-def load_yorosix_ripple(data_dir='data/'):
+# SHA-256 で Actor ID を匿名化
+def hash_id(id_value):
+    if pd.isna(id_value):
+        return None
+    return hashlib.sha256(str(id_value).encode()).hexdigest()[:8]
+
+# Ripple Graph 構築
+def load_yorosix_ripple(data_dir='sample_data/'):
     G = nx.DiGraph()
-    
-    # CSVロード (ツールからエクスポートしたファイル想定)
+
+    # CSV 読み込み
     try:
-        members = pd.read_csv(f'{data_dir}members.csv')  # ユーザー情報
-        posts = pd.read_csv(f'{data_dir}posts.csv')      # 投稿 (Request)
-        replies = pd.read_csv(f'{data_dir}replies.csv')  # Response
-        share_links = pd.read_csv(f'{data_dir}share_links.csv')  # Share
-        request_visits = pd.read_csv(f'{data_dir}request_visits.csv')  # 訪問/深度
-        thanks_logs = pd.read_csv(f'{data_dir}thanks_logs.csv')  # Thanks (オプション協力)
+        members = pd.read_csv(f'{data_dir}members.csv')
+        posts = pd.read_csv(f'{data_dir}posts.csv')
+        replies = pd.read_csv(f'{data_dir}replies.csv')
+        share_links = pd.read_csv(f'{data_dir}share_links.csv')
+        request_visits = pd.read_csv(f'{data_dir}request_visits.csv')
+        thanks_logs = pd.read_csv(f'{data_dir}thanks_logs.csv')
     except FileNotFoundError as e:
-        print(f"Error: CSV file missing - {e}")
+        print(f"Error: Missing CSV → {e}")
         return G
-    
-    # アクターID匿名化 (SHA-256)
-    def hash_id(id_value):
-        if pd.isna(id_value):
-            return None
-        return hashlib.sha256(str(id_value).encode()).hexdigest()[:8]  # 短く表示
-    
-    # ノード追加 (membersからユーザー)
+
+    # 型を揃える（merge が失敗しないための最重要ポイント）
+    posts['id'] = posts['id'].astype(str)
+    replies['request_id'] = replies['request_id'].astype(str)
+
+    # ノード追加（Actor）
     for _, row in members.iterrows():
         actor_id = hash_id(row['id'])
         G.add_node(actor_id, label=f"Actor {actor_id}", original_id=row['id'])
-    
-    # エッジ追加: posts/repliesからResponse連鎖 (emailで紐付け)
-    replies = replies.merge(posts[['id', 'member_id', 'created']], left_on='request_id', right_on='id', suffixes=('_reply', '_post'))
-    for _, row in replies.iterrows():
-        # emailでmembersと紐付け
+
+    # === Response 連鎖（返信者 → 投稿者）===
+    # replies.request_id → posts.id で merge
+    replies_merged = replies.merge(
+        posts[['id', 'member_id', 'created']],
+        left_on='request_id',
+        right_on='id',
+        suffixes=('_reply', '_post')
+    )
+
+    if 'member_id_post' not in replies_merged.columns:
+        print("ERROR: merge failed → request_id と posts.id が一致していません")
+        print(replies_merged.head())
+        return G
+
+    for _, row in replies_merged.iterrows():
+        # 返信者（email → members）
         email = row['email']
         member_match = members[members['email'] == email]
-        
-        if len(member_match) > 0:
-            from_id = hash_id(member_match.iloc[0]['id'])  # emailから該当member_id取得
-            to_id = hash_id(row['member_id_post'])  # post作成者
-            latency = (pd.to_datetime(row['created_at']) - pd.to_datetime(row['created_post'])).total_seconds() / 60 if 'created_post' in row else 0
-            G.add_edge(from_id, to_id, action='Response', latency=latency)
-    
-    # エッジ追加: share_linksからShare連鎖
-    for _, row in share_links.iterrows():
-        from_id = hash_id(row['owner_user_id'])
-        to_id = hash_id(row['request_id'])  # 共有先request
-        latency = 0  # shareは即時想定、必要なら追加
-        G.add_edge(from_id, to_id, action='Share', latency=latency, ripple_depth=row.get('ripple_depth', 0))
-    
-    # エッジ追加: request_visitsから訪問/深度 (オプション連鎖)
-    for _, row in request_visits.iterrows():
-        visitor_id = hash_id(row['visitor_user_id'])
-        if visitor_id is None:  # visitor_user_idがnullの場合スキップ
+
+        if len(member_match) == 0:
             continue
-        to_id = hash_id(row['request_id'])
-        latency = 0  # 訪問時間差追加可能
-        G.add_edge(visitor_id, to_id, action='Visit', latency=latency, ripple_depth=row['ripple_depth'])
-    
-    # エッジ追加: thanks_logsからThanks (協力感謝連鎖) - emailで紐付け
+
+        from_id = hash_id(member_match.iloc[0]['id'])  # 返信者
+        to_id = hash_id(row['member_id_post'])          # 投稿者
+
+        latency = (
+            pd.to_datetime(row['created_at']) -
+            pd.to_datetime(row['created_post'])
+        ).total_seconds() / 60
+
+        G.add_edge(from_id, to_id, action='Response', latency=latency)
+
+    # === Share 連鎖（共有者 → 投稿者）===
+    for _, row in share_links.iterrows():
+        # request_id → posts.member_id に変換
+        req = posts[posts['id'] == str(row['request_id'])]
+        if len(req) == 0:
+            continue
+
+        to_member = req.iloc[0]['member_id']
+        from_id = hash_id(row['owner_user_id'])
+        to_id = hash_id(to_member)
+
+        G.add_edge(from_id, to_id, action='Share', latency=0)
+
+    # === Visit 連鎖（訪問者 → 投稿者）===
+    for _, row in request_visits.iterrows():
+        req = posts[posts['id'] == str(row['request_id'])]
+        if len(req) == 0:
+            continue
+
+        to_member = req.iloc[0]['member_id']
+        from_id = hash_id(row['visitor_user_id'])
+        to_id = hash_id(to_member)
+
+        G.add_edge(from_id, to_id, action='Visit', latency=0)
+
+    # === Thanks 連鎖（感謝送信者 → 受信者）===
     for _, row in thanks_logs.iterrows():
-        # sender_idでmembers検索
-        sender_match = members[members['id'] == row['sender_id']]
-        giver_match = members[members['id'] == row['giver_member_id']]
-        
-        if len(sender_match) > 0 and len(giver_match) > 0:
-            from_id = hash_id(sender_match.iloc[0]['id'])
-            to_id = hash_id(giver_match.iloc[0]['id'])
-            latency = 0
-            G.add_edge(from_id, to_id, action='Thanks', latency=latency)
-    
+        sender = members[members['id'] == row['sender_id']]
+        receiver = members[members['id'] == row['giver_member_id']]
+
+        if len(sender) == 0 or len(receiver) == 0:
+            continue
+
+        from_id = hash_id(sender.iloc[0]['id'])
+        to_id = hash_id(receiver.iloc[0]['id'])
+
+        G.add_edge(from_id, to_id, action='Thanks', latency=0)
+
     return G
 
-# 深度計算 (origin指定、論文のmax path)
+# Ripple Depth（最長距離）
 def calculate_depth(G, origin=None):
     if not origin and G.nodes:
-        origin = list(G.nodes)[0]  # デフォルト原点
+        origin = list(G.nodes)[0]
     try:
         depths = nx.single_source_shortest_path_length(G, origin)
         return max(depths.values())
     except:
         return 0
 
-# Breadth計算 (論文Section 6.3対応)
+# Breadth（深度ごとのノード数）
 def calculate_breadth(G, origin=None):
     if not origin and G.nodes:
         origin = list(G.nodes)[0]
     try:
         levels = nx.single_source_shortest_path_length(G, origin)
-        breadth_per_depth = {}
+        breadth = {}
         for node, depth in levels.items():
-            breadth_per_depth[depth] = breadth_per_depth.get(depth, 0) + 1
-        return breadth_per_depth
+            breadth[depth] = breadth.get(depth, 0) + 1
+        return breadth
     except:
         return {}
 
-# Latency分布
+# Latency 分布
 def get_latency_distribution(G):
-    latencies = [data['latency'] for _, _, data in G.edges(data=True) if 'latency' in data]
-    return latencies
+    return [d['latency'] for _, _, d in G.edges(data=True) if 'latency' in d]
 
-# 可視化 (ripple_depthもラベル追加)
+# 可視化
 def visualize_ripple(G):
     if len(G.nodes) == 0:
         print("No nodes to visualize")
         return
-    
+
     pos = nx.spring_layout(G)
-    edge_labels = {(u, v): f"{d['action']} ({d.get('latency', 0):.2f}min, depth:{d.get('ripple_depth', 0)})" 
-                   for u, v, d in G.edges(data=True)}
-    
-    nx.draw(G, pos, with_labels=True, node_color='lightblue', arrows=True, node_size=800, font_size=8)
+    edge_labels = {
+        (u, v): f"{d['action']} ({d.get('latency', 0):.1f}m)"
+        for u, v, d in G.edges(data=True)
+    }
+
+    nx.draw(G, pos, with_labels=True, node_color='lightblue',
+            arrows=True, node_size=800, font_size=8)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=7)
-    plt.title("Ripple Structure from YOROSIX CSV")
+    plt.title("Ripple Structure")
     plt.tight_layout()
     plt.show()
 
-# 実行例 (コマンドラインでフォルダパス指定: sys.argv[1])
+# 実行
 if __name__ == "__main__":
-    data_dir = sys.argv[1] if len(sys.argv) > 1 else 'sample_data/'  # デフォルトをsample_data/に変更
+    data_dir = sys.argv[1] if len(sys.argv) > 1 else 'sample_data/'
     print(f"Loading from folder: {data_dir}")
+
     G = load_yorosix_ripple(data_dir)
-    
-    print(f"\n=== Ripple Analysis Results ===")
+
+    print("\n=== Ripple Analysis Results ===")
     print(f"Total Nodes: {len(G.nodes)}")
     print(f"Total Edges: {len(G.edges)}")
     print(f"Max Ripple Depth: {calculate_depth(G)}")
-    
+
     breadth = calculate_breadth(G)
     print(f"Breadth per Depth: {breadth}")
-    
+
     latencies = get_latency_distribution(G)
     if latencies:
-        print(f"Latency Distribution: Mean={np.mean(latencies):.2f}min, Std={np.std(latencies):.2f}min")
-        print(f"  Min={min(latencies):.2f}min, Max={max(latencies):.2f}min")
+        print(f"Latency Mean={np.mean(latencies):.2f}m, Std={np.std(latencies):.2f}m")
     else:
-        print(f"Latency Distribution: No data")
-    
+        print("Latency: No data")
+
     visualize_ripple(G)
