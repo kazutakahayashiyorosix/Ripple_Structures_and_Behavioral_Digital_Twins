@@ -146,7 +146,7 @@ Draws the Ripple graph with action types, latency, and depth.
 
 ### Add new event types
 
-```python
+
 G.add_edge(from_id, to_id, action='CustomAction', latency=...)
 
 
