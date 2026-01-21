@@ -41,7 +41,7 @@ def load_yorosix_ripple(data_dir='data/'):
         
         if len(member_match) > 0:
             from_id = hash_id(member_match.iloc[0]['id'])  # emailから該当member_id取得
-            to_id = hash_id(row['member_id'])  # post作成者
+            to_id = hash_id(row['member_id_post'])  # post作成者
             latency = (pd.to_datetime(row['created_at']) - pd.to_datetime(row['created_post'])).total_seconds() / 60 if 'created_post' in row else 0
             G.add_edge(from_id, to_id, action='Response', latency=latency)
     
