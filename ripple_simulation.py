@@ -46,7 +46,7 @@ def load_yorosix_ripple(data_dir='sample_data/'):
         suffixes=('_reply', '_post')
     )
 
-    if 'member_id_post' not in replies_merged.columns:
+    if 'member_id' not in replies_merged.columns:
         print("ERROR: merge failed → request_id と posts.id が一致していません")
         print(replies_merged.head())
         return G
@@ -58,7 +58,7 @@ def load_yorosix_ripple(data_dir='sample_data/'):
             continue
 
         from_id = hash_id(member_match.iloc[0]['id'])      # 返信者
-        to_id = hash_id(row['member_id_post'])             # 投稿者
+        to_id = hash_id(row['member_id'])             # 投稿者
 
         latency = (
             pd.to_datetime(row['created_at']) -
