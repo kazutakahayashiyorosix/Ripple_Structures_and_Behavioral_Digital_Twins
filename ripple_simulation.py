@@ -1,10 +1,11 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import hashlib
 import sys
+from collections import defaultdict
+import numpy as np
 
 # =========================
 # ユーティリティ
@@ -109,72 +110,105 @@ def load_yorosix_ripple(data_dir="sample_data/"):
     return G
 
 # =========================
-# 5枚まとめて可視化
+# 分析機能（論文準拠）
 # =========================
 
-def visualize_all_in_one(G, top_k=5):
-    if not G.nodes:
-        print("No graph data")
-        return
+def compute_depth(G, origin):
+    return nx.single_source_shortest_path_length(G, origin)
 
-    fig, axes = plt.subplots(2, 3, figsize=(16, 10))
+def compute_breadth(depths):
+    max_d = max(depths.values())
+    counts = [0] * (max_d + 1)
+    for d in depths.values():
+        counts[d] += 1
+    return counts
+
+def compute_latency(G):
+    latencies = []
+    for _, _, data in G.edges(data=True):
+        if "latency" in data and data["latency"] > 0:
+            latencies.append(data["latency"])
+    return latencies
+
+def detect_repropagation_nodes(G, threshold=3):
+    share_counts = defaultdict(int)
+    for u, v, data in G.edges(data=True):
+        if data.get("action") == "Share":
+            share_counts[u] += 1
+    return [n for n, c in share_counts.items() if c >= threshold]
+
+def hierarchical_layout(G, origin):
+    depths = compute_depth(G, origin)
+
+    layers = defaultdict(list)
+    for node, d in depths.items():
+        layers[d].append(node)
+
+    pos = {}
+
+    # 到達可能ノード
+    for d, nodes in layers.items():
+        for i, n in enumerate(nodes):
+            pos[n] = (i, -d)
+
+    # 到達不能ノード（origin から辿れない）
+    unreachable = set(G.nodes()) - set(depths.keys())
+    if unreachable:
+        y = -(max(layers.keys()) + 1) if layers else 0
+        for i, n in enumerate(sorted(unreachable)):
+            pos[n] = (i, y)
+
+    return pos
+
+
+# =========================
+# 可視化（7枚）
+# =========================
+
+def visualize_all(G):
+    origin = list(G.nodes)[0]
+    depths = compute_depth(G, origin)
+    breadth = compute_breadth(depths)
+    latencies = compute_latency(G)
+    reprop_nodes = detect_repropagation_nodes(G)
+
+    fig, axes = plt.subplots(3, 3, figsize=(18, 14))
     axes = axes.flatten()
 
-    pos = nx.spring_layout(G, seed=0)
-    origin = list(G.nodes)[0]
-
     # 1. Ripple Structure
+    pos = nx.spring_layout(G, seed=0)
     nx.draw(G, pos, ax=axes[0], with_labels=True, node_size=400, font_size=7)
     axes[0].set_title("Ripple Structure")
 
     # 2. Depth Heatmap
-    depths = nx.single_source_shortest_path_length(G, origin)
-    max_depth = max(depths.values())
-    counts = [0] * (max_depth + 1)
-    for d in depths.values():
-        counts[d] += 1
-
-    sns.heatmap(
-        [counts],
-        annot=True,
-        fmt="d",
-        cmap="YlOrRd",
-        ax=axes[1],
-        cbar=False
-    )
-    axes[1].set_yticks([0.5])
-    axes[1].set_yticklabels(["Depth"])
+    sns.heatmap([breadth], annot=True, fmt="d", cmap="YlOrRd", ax=axes[1], cbar=False)
     axes[1].set_title("Ripple Depth Heatmap")
 
-    # 3. Ripple Tree
-    tree = nx.bfs_tree(G, origin)
-    pos_tree = nx.spring_layout(tree, seed=0)
-    nx.draw(tree, pos_tree, ax=axes[2], with_labels=True, node_size=400, font_size=7)
-    axes[2].set_title("Ripple Tree (BFS)")
+    # 3. Ripple Tree（階層）
+    pos_h = hierarchical_layout(G, origin)
+    nx.draw(G, pos_h, ax=axes[2], with_labels=True, node_size=400, font_size=7)
+    axes[2].set_title("Ripple Tree (Hierarchical)")
 
-    # 4. Ripple Propagation（静的）
+    # 4. Ripple Propagation
     nx.draw(G, pos, ax=axes[3], with_labels=True, node_size=400)
     axes[3].set_title("Ripple Propagation")
 
-    # 5. Ambassador Flywheel
-    out_deg = dict(G.out_degree())
-    ambassadors = sorted(out_deg, key=out_deg.get, reverse=True)[:top_k]
-    colors = ["gold" if n in ambassadors else "lightblue" for n in G.nodes()]
-    sizes = [800 if n in ambassadors else 400 for n in G.nodes()]
+    # 5. Breadth
+    axes[4].bar(range(len(breadth)), breadth)
+    axes[4].set_title("Ripple Breadth")
 
-    nx.draw(
-        G,
-        pos,
-        ax=axes[4],
-        with_labels=True,
-        node_color=colors,
-        node_size=sizes,
-        font_size=7
-    )
-    axes[4].set_title("Ambassador Flywheel")
+    # 6. Latency Distribution
+    axes[5].hist(latencies, bins=20, color="skyblue")
+    axes[5].set_title("Latency Distribution (min)")
 
-    # 6枠目は空ける
-    axes[5].axis("off")
+    # 7. Re-propagation Nodes
+    colors = ["gold" if n in reprop_nodes else "lightblue" for n in G.nodes()]
+    nx.draw(G, pos, ax=axes[6], node_color=colors, with_labels=True, node_size=400)
+    axes[6].set_title("Re-propagation Nodes")
+
+    # 残りは空白
+    axes[7].axis("off")
+    axes[8].axis("off")
 
     plt.tight_layout()
     plt.show()
@@ -192,4 +226,4 @@ if __name__ == "__main__":
     print("Nodes:", len(G.nodes))
     print("Edges:", len(G.edges))
 
-    visualize_all_in_one(G)
+    visualize_all(G)
