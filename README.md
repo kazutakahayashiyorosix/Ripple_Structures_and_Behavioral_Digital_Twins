@@ -1,11 +1,45 @@
-# Ripple Structure Simulation  
-# リップル構造シミュレーション
+# 🧩 Ripple Simulation Engine（リップル構造シミュレーション）
 
-This repository provides a Python-based simulation for modeling **Ripple Structures** from YOROSIX behavioral event data, as introduced in the paper:
+This repository provides Python-based simulations for reproducing and examining **Ripple Structures**,  
+a framework that models cooperation as information flow, derived from behavioral event data collected via  
+[YOROSIX](https://www.yorosix.com/).
 
-📄 **Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins**  
-Kazutaka Hayashi  
-DOI: https://doi.org/10.5281/zenodo.18298249
+The simulations and models in this repository are based on the following paper:
+
+> ### **Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins**
+> **Kazutaka Hayashi**  
+> 📄 **DOI:** https://doi.org/10.5281/zenodo.18298249
+
+---
+
+## 📦 Scope of this Repository
+
+This repository publicly provides:
+* **The theoretical framework** (linked paper)
+* **Reproducible simulations** (Python source code)
+
+In contrast, the following components remain under the stewardship of  
+**Kazutaka Hayashi at YOROSIX**:
+* The full research program and experimental design
+* Comprehensive behavioral data collected from real-world deployments
+
+> [!TIP]
+> Researchers interested in independent validation, replication, or extension of this work  
+> in different empirical or theoretical contexts are welcome to initiate a conversation,  
+> provided that the research purpose is clearly defined.
+
+---
+
+## 🧩 Challenge: The Coordination Puzzle
+
+If the theory feels abstract, let intuition lead before analysis.  
+We have prepared an experiential entry point where the "Information Flow" becomes tangible.
+
+### **Are you ready to solve the puzzle?**
+### 👉 [**Visit yorosix.com**](https://www.yorosix.com/)
+
+---
+*Warning: Understanding the ripple is easier than mastering it.*
 
 ---
 
