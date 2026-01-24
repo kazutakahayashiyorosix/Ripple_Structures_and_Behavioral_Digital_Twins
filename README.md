@@ -262,9 +262,12 @@ Ripple は以下を前提に構築：
 
 ---
 
-## 11. License  （ライセンス）
+## License（ライセンス）
 
-MIT License © 2026 Kazutaka Hayashi
+MIT License  
+© 2026 Kazutaka Hayashi
+
+See the [LICENSE](./LICENSE) file for details.
 
 ---
 
