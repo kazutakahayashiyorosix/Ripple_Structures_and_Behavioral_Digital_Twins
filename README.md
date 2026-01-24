@@ -83,8 +83,7 @@ A が B を助け、B が C を助け、C が D を助ける…
 
 - Python **3.8+**
 
-### Install dependencies  
-### 依存ライブラリのインストール
+### Install dependencies  （依存ライブラリのインストール）
 
 ```
 pip install -r requirements.txt
