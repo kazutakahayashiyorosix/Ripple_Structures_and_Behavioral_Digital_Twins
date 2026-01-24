@@ -43,8 +43,7 @@ We have prepared an experiential entry point where the "Information Flow" become
 
 ---
 
-## 1. Overview  
-## 1. 概要
+## 1. Overview  （概要）
 
 Ripple Structures represent **directional causal chains of cooperative actions**, such as:
 
@@ -80,8 +79,7 @@ A が B を助け、B が C を助け、C が D を助ける…
 
 ---
 
-## 2. Requirements  
-## 2. 必要環境
+## 2. Requirements  （必要環境） 
 
 - Python **3.8+**
 
@@ -100,11 +98,9 @@ pip install networkx matplotlib numpy pandas seaborn
 
 ---
 
-## 3. Quick Start  
-## 3. クイックスタート
+## 3. Quick Start  （クイックスタート）
 
-### 3.1 Run with Sample Data  
-### 3.1 サンプルデータで実行
+### 3.1 Run with Sample Data  （サンプルデータで実行）
 
 ```
 python ripple_simulation.py sample_data/
@@ -114,8 +110,7 @@ A visualization window with **7 analysis panels** will appear.
 
 ---
 
-### 3.2 Run with Your Own Data  
-### 3.2 自分のデータで実行
+### 3.2 Run with Your Own Data  （自分のデータで実行）
 
 Place the following **6 CSV files** in a folder:
 
@@ -139,8 +134,7 @@ python ripple_simulation.py /path/to/your/csv/folder/
 
 ---
 
-## 4. Sample Data Description  
-## 4. サンプルデータの内容
+## 4. Sample Data Description  （サンプルデータの内容）
 
 The `sample_data/` folder includes:
 
@@ -159,11 +153,9 @@ Example Ripple Chains:
 
 ---
 
-## 5. Code Explanation  
-## 5. コード解説
+## 5. Code Explanation  （コード解説）
 
-### Core Functions  
-### 主な関数
+### Core Functions  （主な関数）
 
 #### `load_yorosix_ripple(data_dir)`
 - Loads all 6 CSV files  
@@ -197,8 +189,7 @@ Displays **7 visual panels**:
 
 ---
 
-## 6. Customization  
-## 6. カスタマイズ
+## 6. Customization  （カスタマイズ） 
 
 ### Add new event types
 
@@ -220,8 +211,7 @@ hash_id(... )[:12]
 
 ---
 
-## 7. Full Dataset Access  
-## 7. データアクセス
+## 7. Full Dataset Access  （データアクセス）
 
 Full YOROSIX datasets are available to research collaborators.
 
@@ -230,8 +220,7 @@ kazutaka.hayashi@yorosix.com
 
 ---
 
-## 8. Citation  
-## 8. 引用
+## 8. Citation  （引用） 
 
 ```
 @article{hayashi2026ripple,
@@ -245,8 +234,7 @@ kazutaka.hayashi@yorosix.com
 
 ---
 
-## 9. Theoretical Background  
-## 9. 理論背景
+## 9. Theoretical Background  （理論背景）
 
 Ripple models cooperation as:
 
@@ -264,8 +252,7 @@ Ripple は以下を前提に構築：
 
 ---
 
-## 10. Troubleshooting  
-## 10. トラブルシューティング
+## 10. Troubleshooting  （トラブルシューティング）
 
 | Issue | Solution |
 |-------|----------|
@@ -276,15 +263,13 @@ Ripple は以下を前提に構築：
 
 ---
 
-## 11. License  
-## 11. ライセンス
+## 11. License  （ライセンス）
 
 MIT License © 2026 Kazutaka Hayashi
 
 ---
 
-## 12. Acknowledgments  
-## 12. 謝辞
+## 12. Acknowledgments  （謝辞）
 
 Thanks to the YOROSIX community for enabling non-interventional observational research.  
 YOROSIX コミュニティに感謝します。
