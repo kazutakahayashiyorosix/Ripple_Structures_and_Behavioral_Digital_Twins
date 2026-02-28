@@ -9,6 +9,7 @@ The simulations and models in this repository are based on the following paper:
 > ### **Modeling Cooperation as Information Flow: Ripple Structures and Behavioral Digital Twins**
 > **Kazutaka Hayashi**  
 > 📄 **DOI:** https://doi.org/10.5281/zenodo.18298249
+> 📄 **DOI:** https://doi.org/10.5281/zenodo.18298603
 
 ---
 
